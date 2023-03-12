@@ -1,4 +1,4 @@
-# PROD 'travel, search' Не работает поисковик
+# PROD 'travel' search' Не работает поисковик
 
 ## шаги:
 
