@@ -1,13 +1,14 @@
 import os
 from selenium import webdriver
-
-
+from loguru import logger
 
 
 
 url = 'http://auto.drom.ru/'
 path = os.path.dirname(os.path.realpath(__file__))
 driver = webdriver.Chrome(path + r'\Driver\chromedriver.exe')
+logger.add("debug.log", format="{time:YYYY:MMM:D:HH:mm:Z} {level} {message}",
+           level="DEBUG", rotation="200 MB",  compression="zip")
 
 
 # XPATH FILTER FIELDS

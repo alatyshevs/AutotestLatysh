@@ -11,21 +11,29 @@ from selenium.webdriver.support import expected_conditions as EC
 
 
 def startBrowser():
-    drom.driver.get(drom.url) #Открываем Браузер переходим на страницу "приморского края"
-    WebDriverWait(drom.driver, 10).until(
-        EC.presence_of_element_located(
-            (By.XPATH, "//a[@class = 'css-c96isf esqr6ni0']"))
-    )
-    drom.driver.find_element(By.XPATH, "//a[@class = 'css-c96isf esqr6ni0']").click()
-    WebDriverWait(drom.driver, 10).until(
-        EC.presence_of_element_located(
-            (By.XPATH, "//div[@class = 'b-selectCars__section']"))
-    )
-    drom.driver.find_element(By.XPATH, drom.input_region('Приморский край')).click()
-    WebDriverWait(drom.driver, 10).until(
-        EC.presence_of_element_located(
-            (By.XPATH, "//h1[contains(text(), 'Продажа автомобилей в Приморском крае')]"))
-    )
+    try:
+        drom.logger.info(" # - Старт тест : test3_select_top20.py - # ")
+        drom.driver.get(drom.url) #Открываем Браузер переходим на страницу "приморского края"
+        WebDriverWait(drom.driver, 10).until(
+            EC.presence_of_element_located(
+                (By.XPATH, "//a[@class = 'css-c96isf esqr6ni0']"))
+        )
+        drom.driver.find_element(By.XPATH, "//a[@class = 'css-c96isf esqr6ni0']").click()
+        WebDriverWait(drom.driver, 10).until(
+            EC.presence_of_element_located(
+                (By.XPATH, "//div[@class = 'b-selectCars__section']"))
+        )
+        drom.driver.find_element(By.XPATH, drom.input_region('Приморский край')).click()
+        WebDriverWait(drom.driver, 10).until(
+            EC.presence_of_element_located(
+                (By.XPATH, "//h1[contains(text(), 'Продажа автомобилей в Приморском крае')]"))
+        )
+        drom.logger.info(" ok Регион выбирается успешно")
+    except: 
+        drom.logger.exception
+        drom.logger.error("! _ Ошибка при выборе региона _ !")
+        raise Exception
+    
 
 def sort_and_transformation(a):
     c = []
@@ -56,28 +64,34 @@ def sort_and_transformation(a):
 
 
 def selector():
-    WebDriverWait(drom.driver, 10).until(
-        EC.presence_of_element_located((By.XPATH, drom.marka_auto_fields))
-    )
-    drom.driver.find_element(By.XPATH, drom.marka_auto_fields).click()
-    # Открываем файл с перечнем всевозможных марок машин
-    file = open('catalogAuto.txt', encoding='utf-8')
-    A = []
-    # перебором собираем весь массив данных
-    for i in range(0, 240):
-        element = drom.driver.find_element(By.XPATH, drom.marka_auto_fields)
-        element.send_keys(file.readline())
-        time.sleep(0.2)
-        marka = drom.driver.find_elements(By.XPATH, "//div[@class = 'css-1r0zrug e1uu17r80' ]")
-        for j in range(0, len(marka)): # Пропускаем : пустые строки, любая марка, машины без объявлений
-            if marka[j].text[len(marka[j].text)-1:len(marka[j].text)] == ')':
-                A.append(marka[j].text)
-        element.clear()
-    B = []
-    [B.append(x) for x in A if x not in B] # Убираем из списка повторяющиеся элементы
-    table = sort_and_transformation(B) # Выполняем сортировку по убыванию и отбрасываем лишнее
-    col_names = ['Фирма', 'Количество объявлений'] # Оформляем в виде таблицы
-    print(tabulate(table, headers=col_names, tablefmt="grid"))
+    try:
+        WebDriverWait(drom.driver, 10).until(
+            EC.presence_of_element_located((By.XPATH, drom.marka_auto_fields))
+        )
+        drom.driver.find_element(By.XPATH, drom.marka_auto_fields).click()
+        # Открываем файл с перечнем всевозможных марок машин
+        file = open('catalogAuto.txt', encoding='utf-8')
+        A = []
+        # перебором собираем весь массив данных
+        for i in range(0, 240):
+            element = drom.driver.find_element(By.XPATH, drom.marka_auto_fields)
+            element.send_keys(file.readline())
+            time.sleep(0.2)
+            marka = drom.driver.find_elements(By.XPATH, "//div[@class = 'css-1r0zrug e1uu17r80' ]")
+            for j in range(0, len(marka)): # Пропускаем : пустые строки, любая марка, машины без объявлений
+                if marka[j].text[len(marka[j].text)-1:len(marka[j].text)] == ')':
+                    A.append(marka[j].text)
+            element.clear()
+        B = []
+        [B.append(x) for x in A if x not in B] # Убираем из списка повторяющиеся элементы
+        table = sort_and_transformation(B) # Выполняем сортировку по убыванию и отбрасываем лишнее
+        col_names = ['Фирма', 'Количество объявлений'] # Оформляем в виде таблицы
+        drom.logger.info(" ok Таблица автомобилей сформирована")
+        drom.logger.info('\n' + str(tabulate(table, headers=col_names, tablefmt="grid")))
+    except:
+        drom.logger.exception
+        drom.logger.error("! _ Ошибка при формировании таблицы _ !")
+        raise Exception
 
 
 def runner():
@@ -85,8 +99,7 @@ def runner():
         startBrowser()
         selector()
     except Exception:
-        print('Errors')
+        pass
     finally:
-        print('Ending auto-test')
-
-
+        drom.logger.info(" # - Тест завершён - # ") 
+        drom.logger.info(" # - ------------- - # ")
